@@ -1,0 +1,23 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src/generated"
+  engineType = "client"
+  runtime    = "bun"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model kvStore {
+  key   String @id
+  value String
+}
+
+model quotes {
+  id        Int      @id @default(autoincrement())
+  quote     String
+  isPosted  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

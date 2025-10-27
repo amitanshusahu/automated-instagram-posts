@@ -1,0 +1,10 @@
+export interface Env {
+  INSTAGRAM_ACCESS_TOKEN: string;
+  INSTAGRAM_BUSINESS_ACCOUNT_ID: string;
+  INSTAGRAM_API_VERSION: string;
+  SUPABASE_BUCKET_NAME: string;
+  SUPABASE_DB_URL: string;
+  SUPABASE_PROJECT_URL: string;
+  SUPABASE_SERVICE_ROLE_KEY: string;
+  GEMINI_API_KEY: string;
+}
