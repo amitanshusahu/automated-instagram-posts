@@ -5,3 +5,6 @@ compatibility_date = "2024-10-27"
 # Cron triggers for 10 AM IST (4:30 AM UTC) and 6 PM IST (12:30 PM UTC)
 [triggers]
 crons = ["30 4 * * *", "30 12 * * *"]
+
+# Secrets (set using: wrangler secret put API_ENDPOINT)
+# API_ENDPOINT = "your-api-endpoint-url"

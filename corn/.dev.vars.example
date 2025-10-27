@@ -1,0 +1,5 @@
+# Environment variables for local development
+# Copy this file to .dev.vars and add your actual values
+# This file is ignored by git for security
+
+API_ENDPOINT=https://example.com/trigger

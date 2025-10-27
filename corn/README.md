@@ -7,7 +7,7 @@ A simple Cloudflare Worker that triggers an endpoint at scheduled times using Cr
 - **6 PM IST** (12:30 PM UTC) - Daily
 
 ## Endpoint
-Triggers: `xyz.com/trigger` (Update in `src/index.ts`)
+Makes a GET request to the endpoint configured in the `API_ENDPOINT` secret.
 
 ## Setup
 
@@ -16,7 +16,19 @@ Triggers: `xyz.com/trigger` (Update in `src/index.ts`)
    npm install
    ```
 
-2. Update the endpoint URL in `src/index.ts` if needed (currently set to `xyz.com/trigger`)
+2. **Set up the API endpoint secret:**
+
+   For local development:
+   ```bash
+   cp .dev.vars.example .dev.vars
+   # Edit .dev.vars and add your actual endpoint URL
+   ```
+
+   For production (after deploying):
+   ```bash
+   npx wrangler secret put API_ENDPOINT
+   # Then enter your endpoint URL when prompted
+   ```
 
 3. Login to Cloudflare:
    ```bash
@@ -28,12 +40,20 @@ Triggers: `xyz.com/trigger` (Update in `src/index.ts`)
    npm run deploy
    ```
 
+5. Set the production secret:
+   ```bash
+   npx wrangler secret put API_ENDPOINT
+   ```
+   Enter your endpoint URL (e.g., `https://xyz.com/trigger`) when prompted.
+
 ## Development
 
-Run locally (note: cron triggers won't fire locally, but you can test the fetch handler):
+Run locally:
 ```bash
 npm run dev
 ```
+
+Note: Make sure you have `.dev.vars` file with your API_ENDPOINT set for local testing.
 
 ## Testing Cron Triggers
 
@@ -48,3 +68,12 @@ Or via the Cloudflare dashboard after deployment.
 
 - **wrangler.toml**: Contains the worker configuration and cron schedules
 - **src/index.ts**: Main worker code with the scheduled event handler
+- **.dev.vars**: Local environment variables (not committed to git)
+- **API_ENDPOINT**: Secret containing the endpoint URL to trigger
+
+## Security
+
+The API endpoint URL is stored as a secret and never exposed in the code. To update it:
+```bash
+npx wrangler secret put API_ENDPOINT
+```

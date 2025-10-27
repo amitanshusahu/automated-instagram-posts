@@ -1,9 +1,9 @@
 export interface Env {
-  // Add any environment variables here if needed
+  // Secret environment variable for API endpoint
+  API_ENDPOINT: string;
 }
 
 export default {
-  // Handle scheduled cron triggers
   async scheduled(
     event: any,
     env: Env,
@@ -12,9 +12,19 @@ export default {
     console.log(`Cron trigger fired at: ${new Date().toISOString()}`);
     
     try {
-      // Make the API call to your endpoint
-      const response = await fetch("");
-      
+      // Check if API_ENDPOINT secret is configured
+      if (!env.API_ENDPOINT) {
+        throw new Error('API_ENDPOINT secret is not configured');
+      }
+
+      // Make the GET request to your endpoint
+      const response = await fetch(env.API_ENDPOINT, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
       if (!response.ok) {
         throw new Error(`API call failed with status: ${response.status}`);
       }
@@ -22,7 +32,6 @@ export default {
       console.log('Successfully triggered endpoint:', await response.text());
     } catch (error) {
       console.error('Error triggering endpoint:', error);
-      // Re-throw to mark the scheduled event as failed
       throw error;
     }
   },
