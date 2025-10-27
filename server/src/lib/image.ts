@@ -9,6 +9,8 @@ const fontPath = path.resolve(__dirname, "../font/IBMPlexMono-SemiBold.ttf");
 
 export async function generateQuoteImage(quote: string): Promise<Uint8Array> {
   const fontData = fs.readFileSync(fontPath);
+  const imageData = fs.readFileSync(path.resolve(__dirname, "../image/bg2.png"));
+  const base64Image = imageData.toString("base64");
 
   const svg = await satori(
     {
@@ -18,17 +20,60 @@ export async function generateQuoteImage(quote: string): Promise<Uint8Array> {
           width: "1080px",
           height: "1080px",
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
+          justifyContent: "space-between",
           alignItems: "center",
-          textAlign: "center",
-          background: "#fef9f4",
+          backgroundImage: `url(data:image/png;base64,${base64Image})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           color: "#222",
           fontFamily: "IBM Plex Mono",
-          fontSize: "48px",
-          padding: "80px",
-          whiteSpace: "pre-wrap",
+          padding: "100px 80px",
+          textAlign: "center",
         },
-        children: `"${quote}"`,
+        children: [
+          {
+            type: "div",
+            props: {
+              style: {
+                fontSize: "28px",
+                letterSpacing: "4px",
+                textTransform: "uppercase",
+                color: "#555",
+              },
+              children: "Daily Dev Quotes",
+            },
+          },
+          {
+            type: "div",
+            props: {
+              style: {
+                flexGrow: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontSize: "48px",
+                lineHeight: 1.5,
+                padding: "0 40px",
+                maxWidth: "800px",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+              },
+              children: `“${quote}”`,
+            },
+          },
+          {
+            type: "div",
+            props: {
+              style: {
+                fontSize: "24px",
+                color: "#888",
+                letterSpacing: "2px",
+              },
+              children: "@dailydev_quotes",
+            },
+          },
+        ],
       },
     } as any,
     {
@@ -45,11 +90,17 @@ export async function generateQuoteImage(quote: string): Promise<Uint8Array> {
     }
   );
 
-  const resvg = new Resvg(svg, { fitTo: { mode: "width", value: 1080 } });
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: 1080 },
+    background: "white",
+  });
+
   const png = resvg.render();
-  fs.writeFileSync("quote.png", png.asPng());
-
-  console.log("✅ Image generated successfully!");
-
+  // const outputPath = path.resolve(__dirname, "quote.png");
+  // fs.writeFileSync(outputPath, png.asPng());
+  console.log("✅ Quote image generated:");
   return png.asPng();
 }
+
+// quick test
+// generateQuoteImage("The only way to do great work is to love what you do").catch(console.error);
