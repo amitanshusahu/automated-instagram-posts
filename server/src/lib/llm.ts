@@ -84,7 +84,7 @@ export async function getDailyQuote() {
 }
 
 // Test run
-getDailyQuote().then(({ quote, caption }) => {
-  console.log("Quote:", quote);
-  console.log("Caption:", caption);
-});
+// getDailyQuote().then(({ quote, caption }) => {
+//   console.log("Quote:", quote);
+//   console.log("Caption:", caption);
+// });
