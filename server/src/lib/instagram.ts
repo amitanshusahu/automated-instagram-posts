@@ -34,6 +34,10 @@ export async function postToInstagram({ imageUrl, caption }: InstagramPostOption
 
     console.log("📸 Media object created:", mediaData.id);
 
+    if(!mediaData.id) {
+      throw new Error("No media ID returned from Instagram");
+    }
+
     // Step 2: Publish the media
     const publish = await fetch(
       `https://graph.facebook.com/v20.0/${businessAccountId}/media_publish`,
