@@ -6,6 +6,25 @@ interface InstagramPostOptions {
   caption: string;
 }
 
+async function waitForMediaReady(creationId: string, accessToken: string, maxAttempts = 10) {
+  for (let i = 0; i < maxAttempts; i++) {
+    const statusRes = await fetch(
+      `https://graph.facebook.com/v20.0/${creationId}?fields=status_code&access_token=${accessToken}`
+    );
+    const statusData: any = await statusRes.json();
+
+    console.log(`⏳ Checking media status [${i + 1}/${maxAttempts}] →`, statusData.status_code);
+
+    if (statusData.status_code === "FINISHED") {
+      console.log("✅ Media ready to publish");
+      return;
+    }
+
+    await new Promise((r) => setTimeout(r, 2000)); // 2 sec wait
+  }
+  throw new Error("Media not ready after max attempts");
+}
+
 export async function postToInstagram({ imageUrl, caption }: InstagramPostOptions) {
   const accessToken = await getAccessTokenFromKv();
   const businessAccountId = config.instagram.businessAccountId;
@@ -34,11 +53,12 @@ export async function postToInstagram({ imageUrl, caption }: InstagramPostOption
 
     console.log("📸 Media object created:", mediaData.id);
 
-    if(!mediaData.id) {
-      throw new Error("No media ID returned from Instagram");
-    }
+    if (!mediaData.id) throw new Error("No media ID returned from Instagram");
 
-    // Step 2: Publish the media
+    // ✅ Step 2: Wait until media is processed and ready
+    await waitForMediaReady(mediaData.id, accessToken);
+
+    // Step 3: Publish the media
     const publish = await fetch(
       `https://graph.facebook.com/v20.0/${businessAccountId}/media_publish`,
       {
