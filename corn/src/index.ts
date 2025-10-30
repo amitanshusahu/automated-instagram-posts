@@ -6,7 +6,7 @@ export interface Env {
 // Retry configuration
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 2000; // 2 seconds between retries
-const REQUEST_TIMEOUT_MS = 120000; // 120 seconds timeout (slightly more than Render's 50s)
+const REQUEST_TIMEOUT_MS = 180000; // 180 seconds timeout (slightly more than Render's 50s)
 
 export default {
   async scheduled(
@@ -16,17 +16,17 @@ export default {
   ): Promise<void> {
     console.log(`Cron trigger fired at: ${new Date().toISOString()}`);
     
+    // Check if API_ENDPOINT secret is configured
+    if (!env.API_ENDPOINT) {
+      throw new Error('API_ENDPOINT secret is not configured');
+    }
+    
     let retryCount = 0;
     
-    while (retryCount <= MAX_RETRIES) {
+    while (true) {
       try {
-        console.log(`Attempt ${retryCount + 1} of ${MAX_RETRIES + 1}`);
+        console.log(`Attempt ${retryCount + 1}${retryCount > 0 ? ` (retry ${retryCount})` : ''}`);
         
-        // Check if API_ENDPOINT secret is configured
-        if (!env.API_ENDPOINT) {
-          throw new Error('API_ENDPOINT secret is not configured');
-        }
-
         // Create AbortController for timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -50,9 +50,8 @@ export default {
           const responseText = await response.text();
           console.log('Successfully triggered endpoint:', responseText);
           
-          // Reset retry count on success
-          retryCount = 0;
-          return; // Exit successfully
+          // Success - exit the loop
+          return;
           
         } catch (fetchError: any) {
           clearTimeout(timeoutId);
@@ -72,7 +71,6 @@ export default {
           retryCount++;
         } else {
           console.error(`All ${MAX_RETRIES + 1} attempts failed`);
-          retryCount = 0; // Reset for next scheduled run
           throw error;
         }
       }
