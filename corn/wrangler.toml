@@ -8,3 +8,10 @@ crons = ["30 4 * * *", "30 12 * * *"]
 
 # Secrets (set using: wrangler secret put API_ENDPOINT)
 # API_ENDPOINT = "your-api-endpoint-url"
+
+[observability]
+[observability.logs]
+enabled = false
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
